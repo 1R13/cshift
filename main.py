@@ -1,0 +1,108 @@
+from langdetect import detect
+from sys import argv
+from sys import stdin
+
+low = "abcdefghijklmnopqrstuvwxyz"
+up = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+poss_languages = ["en", "de"]
+
+# overview of script usage
+def usage():
+	print("Usage: python3 %s options \"text\"\n" % argv[0])
+	print("Options:\n-s <int>\tShift the supplied text by given offset.")
+	print("-r <int>\tRevert shift by given offset.")
+	print("-f <filename>\tLoad text from file.")
+	print("-d\t\tDetect offset of shifted text using word detection.")
+	print("-i\t\tRead text from STDIN.")
+	# print("-l\t\tSupply a language. (borked)")
+	exit()
+
+# shift characters in string by offset
+def shift(msg: str, offset: int):
+	# print("Shifting by", offset)
+	result = ""
+	for c in msg:
+		if low.__contains__(c):
+			list = low
+		elif up.__contains__(c):
+			list = up
+		else:
+			result += c
+			continue
+		i = list.index(c) + offset
+		while i > 25:
+			i -= 26
+		while i < -26:
+			i += 26
+		result += list[i]
+
+	return result
+
+
+# like shift, but negated offset
+def unshift(msg, offset):
+	return shift(msg, offset*-1)
+
+
+def getOffset2(data):
+	for i in range(8):
+		print(i, unshift(data, i)[:50])
+
+
+def getOffset(data: str, lan):
+	print(lan)
+	og = data
+	poss_offset = (0, 0)
+	for i in range(1, 26):
+		data = unshift(og, i)
+		dic = {}
+		for sen in data.split("."):
+			for word in sen.replace(",", "").replace("\n", "").split(" "):
+				if len(word) > 1:	
+					try:
+						lan = detect(word)
+						dic[lan] += 1
+					except KeyError:
+						dic[lan] = 1
+					except Exception as e:
+						pass
+		max_hits = ("", 0) # language and detected words
+		for k in dic:
+			if dic[k] > max_hits[1]:
+				max_hits = (k, dic[k])
+		# print(max_hits, i)
+		
+		if lan.__contains__(max_hits[0]) and max_hits[1] > poss_offset[1]:
+			print("Possible offset of", i, "in", max_hits[0])
+			poss_offset = (i, max_hits[1])
+	print(unshift(og, poss_offset[0]))
+
+def main():
+	if argv.__contains__("-l"):
+		poss_languages = [argv[argv.index("-l")+1]]
+
+	if argv.__contains__("-f"):
+		try:
+			data = open(argv[argv.index("-f")+1], "r").read()
+		except FileNotFoundError:
+			usage()
+	elif argv.__contains__("-i"):
+		data = stdin.readline()
+	else:
+		data = argv[-1]
+
+	try:
+		if argv.__contains__("-d"):
+			getOffset(data, poss_languages)
+		elif argv.__contains__("-s"):	
+			print(shift(data, int(argv[argv.index("-s")+1])))
+		elif argv.__contains__("-r"):
+			print(unshift(data, int(argv[argv.index("-r")+1])))
+		else:
+			usage()
+	except Exception as e:
+		print(e)
+		usage()
+
+main()
