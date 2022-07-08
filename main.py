@@ -15,12 +15,11 @@ def usage():
 	print("-f <filename>\tLoad text from file.")
 	print("-d\t\tDetect offset of shifted text using word detection.")
 	print("-i\t\tRead text from STDIN.")
-	# print("-l\t\tSupply a language. (borked)")
+	print("-l <en,de,fr>\t\tSupply possible languages of original.")
 	exit()
 
 # shift characters in string by offset
 def shift(msg: str, offset: int):
-	# print("Shifting by", offset)
 	result = ""
 	for c in msg:
 		if low.__contains__(c):
@@ -50,10 +49,10 @@ def getOffset2(data):
 		print(i, unshift(data, i)[:50])
 
 
-def getOffset(data: str, lan):
-	print(lan)
+def getOffset(data: str, langs):
+	print(langs)
 	og = data
-	poss_offset = (0, 0)
+	poss_offset = (0, 0) # offset and detected words
 	for i in range(1, 26):
 		data = unshift(og, i)
 		dic = {}
@@ -67,20 +66,25 @@ def getOffset(data: str, lan):
 						dic[lan] = 1
 					except Exception as e:
 						pass
-		max_hits = ("", 0) # language and detected words
+
 		for k in dic:
-			if dic[k] > max_hits[1]:
-				max_hits = (k, dic[k])
-		# print(max_hits, i)
-		
-		if lan.__contains__(max_hits[0]) and max_hits[1] > poss_offset[1]:
-			print("Possible offset of", i, "in", max_hits[0])
-			poss_offset = (i, max_hits[1])
+			if langs.__contains__(k) and poss_offset[1] < dic[k]:
+				poss_offset = (i, dic[k])
+				print("Possible offset of %i with %i words detected in %s." % (i, dic[k], k))
+			else:
+				continue
+
 	print(unshift(og, poss_offset[0]))
+			
+
+	# print(unshift(og, poss_offset[0]))
+
 
 def main():
+
 	if argv.__contains__("-l"):
-		poss_languages = [argv[argv.index("-l")+1]]
+		new_langs = argv[argv.index("-l") + 1]
+		poss_languages = new_langs.split(",")
 
 	if argv.__contains__("-f"):
 		try:
