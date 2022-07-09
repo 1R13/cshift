@@ -23,7 +23,7 @@ python3 cshift.py -s 5 "The ham, green beans, mashed potatoes, and corn are glut
 
 Ymj mfr, lwjjs gjfsx, rfxmji utyfytjx, fsi htws fwj lqzyjs-kwjj.
 ```
-### Reading from STDOUT 
+### Reading from STDIN 
 ```
 cat shifted.txt | python3 cshift.py -i -r 5
 
