@@ -12,7 +12,7 @@ Options:
 -f <filename>   Load text from file.
 -d              Detect offset of shifted text using word detection.
 -i              Read text from STDIN.
--l <en,de,fr>           Supply possible languages of original.
+-l <en,de,fr>   Supply possible languages of original.
 ```
 
 ## Examples
