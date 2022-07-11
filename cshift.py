@@ -5,8 +5,6 @@ from sys import stdin
 low = "abcdefghijklmnopqrstuvwxyz"
 up = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-poss_languages = ["en", "de"]
-
 # overview of script usage
 def usage():
 	print("Usage: python3 %s options \"text\"\n" % argv[0])
@@ -17,6 +15,7 @@ def usage():
 	print("-i\t\tRead text from STDIN.")
 	print("-l <en,de,fr>\tSupply possible languages of original.")
 	exit()
+
 
 # shift characters in string by offset
 def shift(msg: str, offset: int):
@@ -42,11 +41,6 @@ def shift(msg: str, offset: int):
 # like shift, but negated offset
 def unshift(msg, offset):
 	return shift(msg, offset*-1)
-
-
-def getOffset2(data):
-	for i in range(8):
-		print(i, unshift(data, i)[:50])
 
 
 def getOffset(data: str, langs):
@@ -85,6 +79,8 @@ def main():
 	if argv.__contains__("-l"):
 		new_langs = argv[argv.index("-l") + 1]
 		poss_languages = new_langs.split(",")
+	else:
+		poss_languages = ["en", "de"]
 
 	if argv.__contains__("-f"):
 		try:
@@ -108,5 +104,6 @@ def main():
 	except Exception as e:
 		print(e)
 		usage()
+
 
 main()
